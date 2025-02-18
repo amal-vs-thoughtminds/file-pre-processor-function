@@ -34,6 +34,6 @@ async def main(message: dict) -> dict:
         # Convert PDF to images
         await convert_pdf_to_images(folder_structure)
         return file_name
-        
     except Exception as e:
+        logging.error(f"Error in FilePreProcessor: {e}")
         return 'Error';

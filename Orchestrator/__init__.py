@@ -27,18 +27,19 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
         remaining = total_required - len(messages)
         queue_msgs = yield context.call_activity("GetQueueMessages", {"queue_name": queue, "max_messages": remaining})
         messages.extend(queue_msgs)
-    
-    # print("Messages:", messages)
+        
     # 3. Process each file message
     processed_results = []
-    for msg in messages:
-        result = yield context.call_activity("FilePreProcessor", msg)
-        if result != 'Error':
-            processed_results.append(result)
-    
-    # 4. Push successful results to next queue (e.g., loan_id_tnxId_vendor_priority)
-    stage = "classification"
-    yield context.call_activity("PushToNextQueue", {"stage": stage, "processed_results": processed_results})
+    if len(messages) > 0:
+        for msg in messages:
+            result = yield context.call_activity("FilePreProcessor", msg)
+            if result != 'Error':
+                processed_results.append(result)
+        
+    # 4. Push successful results to next queue (e.g., loan_id_tnxId_vendor_priority) 
+    if len(processed_results) > 0:
+        stage = "classification"
+        yield context.call_activity("PushToNextQueue", {"stage": stage, "processed_results": processed_results})
     
     return "Orchestration completed."
     
