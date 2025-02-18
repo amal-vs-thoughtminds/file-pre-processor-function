@@ -22,8 +22,8 @@ The application is structured around Azure Durable Functions, which manage the o
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/your-repo-name.git
-   cd your-repo-name
+   git clone https://github.com/amal-vs-thoughtminds/file-pre-processor-function.git
+   cd file-pre-processor-function
    ```
 
 2. **Set up a virtual environment** (optional but recommended):
