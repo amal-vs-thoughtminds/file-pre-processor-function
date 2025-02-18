@@ -60,8 +60,6 @@ The application is structured around Azure Durable Functions, which manage the o
 2. Trigger the orchestrator function with the necessary parameters.
 3. The orchestrator will call the appropriate activity functions to process the files.
 
-## Contributing
-Contributions are welcome! Please fork the repository and submit a pull request with your changes.
 
 
 ## Acknowledgments
