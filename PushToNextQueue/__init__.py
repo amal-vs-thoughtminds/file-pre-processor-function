@@ -21,13 +21,13 @@ async def main(msg: dict) -> dict:
             # Ensure result is a dictionary
             logging.info(f"Result: {result}")
             if isinstance(result, str):
-                result = {'file_name': result}  # Convert string to dictionary
+                result = {'file_name': result}
             
             if isinstance(result, dict) and 'file_name' in result:
                 file_info = split_file_name.split_file_name(result['file_name'])
                 
-                # Only use alphanumeric characters and underscores for queue name
-                # Azure Queue Storage has strict naming requirements
+
+                # Azure Queue Storage has strict naming requirements create use name like vendor-priority-stage
                 queue_name = f"{file_info['vendor']}-{file_info['priority']}-{stage}".lower()
                 
                 # Ensure queue name meets Azure requirements
@@ -46,7 +46,7 @@ async def main(msg: dict) -> dict:
                 source_path = f'{file_info["vendor"]}/primary/{file_info["file_name"]}.zip'
                 dest_path = f'{file_info["vendor"]}/processed/{file_info["file_name"]}.zip'
                 
-                await move_file(source_path, dest_path)  # Ensure move_file is a callable function
+                await move_file(source_path, dest_path)
                 logging.info(f"Moved file {file_info['file_name']} to processed folder")
             else:
                 logging.warning(f"Unexpected result format: {result}")
