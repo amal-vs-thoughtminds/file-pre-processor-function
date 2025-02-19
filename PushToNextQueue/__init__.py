@@ -42,7 +42,7 @@ async def main(msg: dict) -> dict:
                 
                 await queue_manager.send_message(queue_name, result)
                 logging.info(f"Pushed message to queue: {queue_name}")
-
+                queue_manager.close()
                 source_path = f'{file_info["vendor"]}/primary/{file_info["file_name"]}.zip'
                 dest_path = f'{file_info["vendor"]}/processed/{file_info["file_name"]}.zip'
                 

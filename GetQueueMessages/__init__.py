@@ -23,7 +23,7 @@ async def main(msg):
         # First check if queue exists
         if await queue_manager.exists(queue_name):
             messages = await queue_manager.get_messages(queue_name, max_messages)
-            
+            queue_manager.close()
             print("Messages:", messages)
             processed_messages = [split_file_name(message['content']) for message in messages]
             return remove_duplicates(processed_messages)
