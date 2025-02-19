@@ -1,8 +1,8 @@
 import logging
 import os
 from shared import split_file_name
-from shared.QueueManager import QueueManager  # Ensure this imports the class
-from shared.file_utils.move_file import move_file  # Ensure this imports the function
+from shared.QueueManager import QueueManager
+from shared.file_utils.move_file import move_file 
 
 async def main(msg: dict) -> dict:
     logging.info(f"PushToNextQueue started with message: {msg}")
