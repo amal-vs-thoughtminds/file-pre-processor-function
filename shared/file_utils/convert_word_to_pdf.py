@@ -1,7 +1,7 @@
 import os
 import logging
-from io import BytesIO
-import aspose.words as aw
+import subprocess
+import tempfile
 from shared.file_share_connection import AzureFileShareManager
 
 async def convert_word_to_pdf(file_share: AzureFileShareManager, source: str, dest_path: str) -> None:
@@ -15,31 +15,42 @@ async def convert_word_to_pdf(file_share: AzureFileShareManager, source: str, de
         if exists:
             logging.info(f"PDF already exists, skipping conversion: {file_name}")
             return
-        
-        # Download the file from Azure
-        source_file = file_share.share_client.get_file_client(source)
-        word_data = await source_file.download_file()
-        word_bytes = await word_data.readall()
 
-        # Convert using Aspose.Words
-        with BytesIO(word_bytes) as in_stream:
-            # Load document from stream
-            doc = aw.Document(in_stream)
-            
-            # Configure save options for optimization
-            save_options = aw.saving.PdfSaveOptions()
-            save_options.compliance = aw.saving.PdfCompliance.PDF17
-            save_options.embed_full_fonts = True
-            
-            # Save to memory stream
-            with BytesIO() as pdf_stream:
-                doc.save(pdf_stream, save_options)
-                pdf_bytes = pdf_stream.getvalue()
+        # Create temporary directory for processing
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_word = os.path.join(temp_dir, f"{file_name}.docx")
+            temp_pdf = os.path.join(temp_dir, f"{file_name}.pdf")
 
-        # Upload to Azure
-        dest_file = file_share.share_client.get_file_client(dest_file_path)
-        await dest_file.upload_file(pdf_bytes)
+            # Download the file from Azure
+            source_file = file_share.share_client.get_file_client(source)
+            word_data = await source_file.download_file()
+            word_bytes = await word_data.readall()
             
+            # Write word file to temp location
+            with open(temp_word, 'wb') as f:
+                f.write(word_bytes)
+
+            # Convert using LibreOffice with optimized settings
+            cmd = [
+                'soffice',
+                '--headless',
+                '--convert-to', 'pdf:writer_pdf_Export',  # Use optimized PDF export
+                '--outdir', temp_dir,
+                temp_word
+            ]
+            process = subprocess.run(cmd, capture_output=True, text=True)
+
+            if process.returncode != 0:
+                raise Exception(f"LibreOffice conversion failed: {process.stderr}")
+
+            # Read the converted PDF
+            with open(temp_pdf, 'rb') as pdf_file:
+                pdf_bytes = pdf_file.read()
+
+            # Upload to Azure
+            dest_file = file_share.share_client.get_file_client(dest_file_path)
+            await dest_file.upload_file(pdf_bytes)
+
         logging.info(f"Converted Word document to PDF successfully: {file_name}")
 
     except Exception as e:
