@@ -34,7 +34,7 @@ async def convert_word_to_pdf(file_share: AzureFileShareManager, source: str, de
             cmd = [
                 'soffice',
                 '--headless',
-                '--convert-to', 'pdf:writer_pdf_Export',  # Use optimized PDF export
+                '--convert-to', 'pdf:writer_pdf_Export',
                 '--outdir', temp_dir,
                 temp_word
             ]
