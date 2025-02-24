@@ -14,7 +14,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
 
     # print("Vendor Queues:", vendor_queues)
     
-    total_required = 32
+    total_required = 50
     messages = []
     
     # # 2. Pull messages from each vendor queue until we have 32 in total.
