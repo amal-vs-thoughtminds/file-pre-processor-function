@@ -59,8 +59,6 @@ class QueueManager:
         except Exception as e:
             logging.error(f"Error getting messages from queue {queue_name}: {str(e)}")
             raise
-        finally:
-            await queue_client.close()
 
     async def close(self):
         await self.queue_service_client.close()

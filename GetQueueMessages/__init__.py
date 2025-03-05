@@ -33,3 +33,5 @@ async def main(msg):
     except Exception as e:
         logging.error(f"Error retrieving messages from queue {queue_name}: {e}")
         raise
+    finally:
+        queue_manager.close()
