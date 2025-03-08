@@ -4,6 +4,10 @@ import os
 import logging
 from typing import List
 
+from pydantic import ValidationError
+
+from shared.schemas.Ai_data import AIQueueData
+
 class QueueManager:
     def __init__(self, connection_string: str):
         self.connection_string = connection_string
@@ -75,7 +79,21 @@ class QueueManager:
             await queue_client.close()
 
     async def send_message(self, queue_name: str, message: dict):
-        queue_client = self.queue_service_client.get_queue_client(queue_name)
-        await queue_client.send_message(message)
-        logging.info(f"Message sent to queue {queue_name}")
-        await queue_client.close()
+        queue_client = None
+        try:
+            # Validate and serialize the message
+            ai_queue_data = AIQueueData(**message)
+            message_str = ai_queue_data.json()
+            
+            queue_client = self.queue_service_client.get_queue_client(queue_name)
+            await queue_client.send_message(message_str)
+            logging.info(f"Message sent to queue {queue_name}")
+        except ValidationError as e:
+            logging.error(f"Message validation failed for queue {queue_name}: {e}")
+            raise ValueError(f"Invalid message data: {e}") from e
+        except Exception as e:
+            logging.error(f"Error sending message to queue {queue_name}: {str(e)}")
+            raise
+        finally:
+            if queue_client:
+                await queue_client.close()
