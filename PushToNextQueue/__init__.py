@@ -47,8 +47,8 @@ async def main(msg: dict) -> dict:
                     "transaction_id": file_info["transaction_id"],
                     "org_name": file_info["vendor"],
                     "priority": rows[0][2],
-                    "image_base_url": f"https://emeraldinternal.file.core.windows.net/internal/opus/secondary/{file_info['unique_id']}/images/high/",
-                    "pdf_base_url": f"https://emeraldinternal.file.core.windows.net/internal/opus/secondary/{file_info['unique_id']}/merge/{file_info['file_name']}.pdf"
+                    "image_base_url": f"https://emeraldinternal.file.core.windows.net/internal/{file_info['vendor']}/secondary/{file_info['unique_id']}/images/high/",
+                    "pdf_base_url": f"https://emeraldinternal.file.core.windows.net/internal/{file_info['vendor']}/secondary/{file_info['unique_id']}/merge/{file_info['file_name']}.pdf"
                 }
 
                 # Queue name construction
